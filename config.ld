@@ -1,0 +1,9 @@
+project='pe-parser'
+title='Portable Executable-parser'
+description='Lua module to parse a Portable Executable (.exe , .dll, etc.) file and extract metadata.'
+format='discount'
+file='./src'
+dir='doc'
+readme='readme.md'
+sort=true
+not_luadoc=true
