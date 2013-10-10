@@ -17,7 +17,7 @@ dependencies = {
 
 source = {
    url = "https://github.com/Tieske/pe-parser/archive/version_0.1.tar.gz",
-   dir = "date-version_0.1",
+   dir = "pe-parser-version_0.1",
 }
 
 build = {
