@@ -7,6 +7,124 @@
 
 local M = {}
 
+--- Table with constants/flag-constants that represent.
+-- Named elements can be looked up by their name in the `const` table.
+-- For flag fields the name is extended with `_flags`.
+-- @usage local desc = pe.const.Magic(myobj.Magic)
+-- local flag_list = pe.const.Characteristics_flags  -- return list of flags for Characteristics field
+M.const = {
+  Magic = {
+    ["10b"] = "PE32",
+    ["20b"] = "PE32+",
+  },
+  Machine = {
+    ["0"] = "IMAGE_FILE_MACHINE_UNKNOWN",
+    ["1d3"] = "IMAGE_FILE_MACHINE_AM33",
+    ["8664"] = "IMAGE_FILE_MACHINE_AMD64",
+    ["1c0"] = "IMAGE_FILE_MACHINE_ARM",
+    ["1c4"] = "IMAGE_FILE_MACHINE_ARMNT",
+    ["aa64"] = "IMAGE_FILE_MACHINE_ARM64",
+    ["ebc"] = "IMAGE_FILE_MACHINE_EBC",
+    ["14c"] = "IMAGE_FILE_MACHINE_I386",
+    ["200"] = "IMAGE_FILE_MACHINE_IA64",
+    ["9041"] = "IMAGE_FILE_MACHINE_M32R",
+    ["266"] = "IMAGE_FILE_MACHINE_MIPS16",
+    ["366"] = "IMAGE_FILE_MACHINE_MIPSFPU",
+    ["466"] = "IMAGE_FILE_MACHINE_MIPSFPU16",
+    ["1f0"] = "IMAGE_FILE_MACHINE_POWERPC",
+    ["1f1"] = "IMAGE_FILE_MACHINE_POWERPCFP",
+    ["166"] = "IMAGE_FILE_MACHINE_R4000",
+    ["1a2"] = "IMAGE_FILE_MACHINE_SH3",
+    ["1a3"] = "IMAGE_FILE_MACHINE_SH3DSP",
+    ["1a6"] = "IMAGE_FILE_MACHINE_SH4",
+    ["1a8"] = "IMAGE_FILE_MACHINE_SH5",
+    ["1c2"] = "IMAGE_FILE_MACHINE_THUMB",
+    ["169"] = "IMAGE_FILE_MACHINE_WCEMIPSV2",
+  },
+  Characteristics_flags = {
+    ["1"] = "IMAGE_FILE_RELOCS_STRIPPED",
+    ["2"] = "IMAGE_FILE_EXECUTABLE_IMAGE",
+    ["4"] = "IMAGE_FILE_LINE_NUMS_STRIPPED",
+    ["8"] = "IMAGE_FILE_LOCAL_SYMS_STRIPPED",
+    ["10"] = "IMAGE_FILE_AGGRESSIVE_WS_TRIM",
+    ["20"] = "IMAGE_FILE_LARGE_ADDRESS_AWARE",
+    ["40"] = "Reserved for future use",
+    ["80"] = "IMAGE_FILE_BYTES_REVERSED_LO",
+    ["100"] = "IMAGE_FILE_32BIT_MACHINE",
+    ["200"] = "IMAGE_FILE_DEBUG_STRIPPED",
+    ["400"] = "IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP",
+    ["800"] = "IMAGE_FILE_NET_RUN_FROM_SWAP",
+    ["1000"] = "IMAGE_FILE_SYSTEM",
+    ["2000"] = "IMAGE_FILE_DLL",
+    ["4000"] = "IMAGE_FILE_UP_SYSTEM_ONLY",
+    ["8000"] = "IMAGE_FILE_BYTES_REVERSED_HI",
+  },
+  Subsystem = {
+    ["0"] = "IMAGE_SUBSYSTEM_UNKNOWN",
+    ["1"] = "IMAGE_SUBSYSTEM_NATIVE",
+    ["2"] = "IMAGE_SUBSYSTEM_WINDOWS_GUI",
+    ["3"] = "IMAGE_SUBSYSTEM_WINDOWS_CUI",
+    ["7"] = "IMAGE_SUBSYSTEM_POSIX_CUI",
+    ["9"] = "IMAGE_SUBSYSTEM_WINDOWS_CE_GUI",
+    ["a"] = "IMAGE_SUBSYSTEM_EFI_APPLICATION",
+    ["b"] = "IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER",
+    ["c"] = "IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER",
+    ["d"] = "IMAGE_SUBSYSTEM_EFI_ROM",
+    ["e"] = "IMAGE_SUBSYSTEM_XBOX",
+  },
+  DllCharacteristics_flags = {
+    ["40"] = "IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE",
+    ["80"] = "IMAGE_DLL_CHARACTERISTICS_FORCE_INTEGRITY",
+    ["100"] = "IMAGE_DLL_CHARACTERISTICS_NX_COMPAT",
+    ["200"] = "IMAGE_DLLCHARACTERISTICS_NO_ISOLATION",
+    ["400"] = "IMAGE_DLLCHARACTERISTICS_NO_SEH",
+    ["800"] = "IMAGE_DLLCHARACTERISTICS_NO_BIND",
+    ["2000"] = "IMAGE_DLLCHARACTERISTICS_WDM_DRIVER",
+    ["8000"] = "IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE",
+  },
+  Sections = {
+    Characteristics_flags = {
+      ["8"] = "IMAGE_SCN_TYPE_NO_PAD",
+      ["20"] = "IMAGE_SCN_CNT_CODE",
+      ["40"] = "IMAGE_SCN_CNT_INITIALIZED_DATA",
+      ["80"] = "IMAGE_SCN_CNT_UNINITIALIZED_ DATA",
+      ["100"] = "IMAGE_SCN_LNK_OTHER",
+      ["200"] = "IMAGE_SCN_LNK_INFO",
+      ["800"] = "IMAGE_SCN_LNK_REMOVE",
+      ["1000"] = "IMAGE_SCN_LNK_COMDAT",
+      ["8000"] = "IMAGE_SCN_GPREL",
+      ["20000"] = "IMAGE_SCN_MEM_PURGEABLE",
+      ["20000"] = "IMAGE_SCN_MEM_16BIT",
+      ["40000"] = "IMAGE_SCN_MEM_LOCKED",
+      ["80000"] = "IMAGE_SCN_MEM_PRELOAD",
+      ["100000"] = "IMAGE_SCN_ALIGN_1BYTES",
+      ["200000"] = "IMAGE_SCN_ALIGN_2BYTES",
+      ["300000"] = "IMAGE_SCN_ALIGN_4BYTES",
+      ["400000"] = "IMAGE_SCN_ALIGN_8BYTES",
+      ["500000"] = "IMAGE_SCN_ALIGN_16BYTES",
+      ["600000"] = "IMAGE_SCN_ALIGN_32BYTES",
+      ["700000"] = "IMAGE_SCN_ALIGN_64BYTES",
+      ["800000"] = "IMAGE_SCN_ALIGN_128BYTES",
+      ["900000"] = "IMAGE_SCN_ALIGN_256BYTES",
+      ["a00000"] = "IMAGE_SCN_ALIGN_512BYTES",
+      ["b00000"] = "IMAGE_SCN_ALIGN_1024BYTES",
+      ["c00000"] = "IMAGE_SCN_ALIGN_2048BYTES",
+      ["d00000"] = "IMAGE_SCN_ALIGN_4096BYTES",
+      ["e00000"] = "IMAGE_SCN_ALIGN_8192BYTES",
+      ["1000000"] = "IMAGE_SCN_LNK_NRELOC_OVFL",
+      ["2000000"] = "IMAGE_SCN_MEM_DISCARDABLE",
+      ["4000000"] = "IMAGE_SCN_MEM_NOT_CACHED",
+      ["8000000"] = "IMAGE_SCN_MEM_NOT_PAGED",
+      ["10000000"] = "IMAGE_SCN_MEM_SHARED",
+      ["20000000"] = "IMAGE_SCN_MEM_EXECUTE",
+      ["40000000"] = "IMAGE_SCN_MEM_READ",
+      ["80000000"] = "IMAGE_SCN_MEM_WRITE",
+    },
+  },
+  
+}
+
+
 --- convert integer to HEX representation
 -- @param IN the number to convert to hex
 -- @param len the size to return, any result smaller will be prefixed by "0"s
@@ -67,6 +185,7 @@ local function get_list(list, f, add_to)
   -- add_to: table to add results to (optional)
   local r = add_to or {}
   for i, t in ipairs(list) do
+    assert(r[t.name] == nil, "Value for '"..t.name.."' already set")
     local val,err = f:read(t.size)  -- read specified size in bytes
     val = val or "\0"    
     if t.is_str then   -- entry is marked as a string value, read as such
@@ -342,11 +461,20 @@ M.dump = function(obj)
   for k,v in pairs(obj) do if #k > l then l = #k end end
   
   for k,v in pairs(obj) do
-    if type(v) == "number" then
-      print(k..string.rep(" ", l - #k + 1)..": "..v.." (dec)")
+    if (M.const[k] and type(v)=="string") then
+      -- look up named value    
+      print(k..string.rep(" ", l - #k + 1)..": "..M.const[k][v])
+    elseif M.const[k.."_flags"] then
+      -- flags should be listed
+      print(k..string.rep(" ", l - #k + 1)..": "..v.." (flag field)")
     else
-      if (type(v)=="string") and (k ~= "DataDirectory") and (k ~= "Sections") then
-        print(k..string.rep(" ", l - #k + 1)..": "..v)
+      -- regular values
+      if type(v) == "number" then
+        print(k..string.rep(" ", l - #k + 1)..": "..v.." (dec)")
+      else
+        if (type(v)=="string") and (k ~= "DataDirectory") and (k ~= "Sections") then
+          print(k..string.rep(" ", l - #k + 1)..": "..v)
+        end
       end
     end
   end
