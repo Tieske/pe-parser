@@ -7,6 +7,37 @@
 
 local M = {}
 
+--- convert integer to HEX representation
+-- @param IN the number to convert to hex
+-- @param len the size to return, any result smaller will be prefixed by "0"s
+-- @return string containing hex representation
+local function DEC_HEX(IN, len)
+    local B,K,OUT,I,D=16,"0123456789abcdef","",0
+    while IN>0 do
+        I=I+1
+        IN,D=math.floor(IN/B),math.fmod(IN,B)+1
+        OUT=string.sub(K,D,D)..OUT
+    end
+    len = len or string.len(OUT)
+    if len<1 then len = 1 end
+    return (string.rep("0",len) .. OUT):sub(-len,-1)
+end
+
+--- convert HEX to integer
+-- @param IN the string to convert to dec
+-- @return number in dec format
+local function HEX_DEC(IN)
+  assert(type(IN)=="string")
+  local OUT = 0
+  IN = IN:lower()
+  while #IN > 0 do
+    local b = string.find("0123456789abcdef",IN:sub(1,1))
+    OUT = OUT * 16 + (b-1)
+    IN = IN:sub(2,-1)
+  end
+  return OUT
+end
+
 local function get_int(str)
   -- convert a byte-sequence to an integer
   assert(str)
@@ -17,12 +48,28 @@ local function get_int(str)
   return r
 end
 
+local function get_hex(str)
+  -- convert a byte-sequence to a hex string
+  assert(str)
+  local r = ""
+  for i = #str, 1, -1 do
+    r = r .. DEC_HEX(string.byte(str,i,i),2)
+  end
+  while (#r > 1) and (r:sub(1,1) == "0") do
+    r = r:sub(2, -1)
+  end
+  return r
+end
+
 local function get_list(list, f, add_to)
-  -- list of tables with 'size' and 'name' and is_str
+  -- list: list of tables with 'size' and 'name' and is_str
+  -- f: file to read from
+  -- add_to: table to add results to (optional)
   local r = add_to or {}
   for i, t in ipairs(list) do
     local val,err = f:read(t.size)  -- read specified size in bytes
-    if t.is_str then
+    val = val or "\0"    
+    if t.is_str then   -- entry is marked as a string value, read as such
       for i = 1, #val do
         if val:sub(i,i) == "\0" then
           r[t.name] = val:sub(1,i-1)
@@ -30,8 +77,8 @@ local function get_list(list, f, add_to)
         end
       end
       r[t.name] = r[t.name] or val
-    else
-      r[t.name] = get_int(val)
+    else  -- entry not marked, so always read as hex value
+      r[t.name] = get_hex(val)
     end
   end
   return r
@@ -40,20 +87,21 @@ end
 --- Calculates the fileoffset of a given RVA.
 -- This function is also available as a method on the parsed output table
 -- @param obj a parsed object (return value from `parse`)
--- @param RVA an RVA value to convert to a fileoffset
--- @return fileoffset of the given RVA
+-- @param RVA an RVA value to convert to a fileoffset (either number or hex-string)
+-- @return fileoffset of the given RVA (number)
 M.get_fileoffset = function(obj, RVA)
   -- given an object with a section table, and an RVA, it returns
   -- the fileoffset for the data
+  if type(RVA)=="string" then RVA = HEX_DEC(RVA) end
   local section
   for i, s in ipairs(obj.Sections) do
-    if s.VirtualAddress <= RVA and s.VirtualAddress + s.VirtualSize >= RVA then
+    if HEX_DEC(s.VirtualAddress) <= RVA and HEX_DEC(s.VirtualAddress) + HEX_DEC(s.VirtualSize) >= RVA then
       section = s
       break
     end
   end
   if not section then return nil, "No match RVA with Section list, RVA out of bounds" end
-  return RVA - section.VirtualAddress + section.PointerToRawData
+  return RVA - HEX_DEC(section.VirtualAddress) + HEX_DEC(section.PointerToRawData)
 end
 
 local function readstring(f)
@@ -68,6 +116,7 @@ local function readstring(f)
 end
 
 --- Parses a file and extracts the information.
+-- All numbers are delivered as "string" types containing hex values, see `DEC_HEX` and `HEX_DEC` conversion functions.
 -- @return table with data, or nil + error
 -- @usage local pe = require("pe-parser")
 -- local obj = pe.parse("c:\lua\lua.exe")
@@ -99,7 +148,7 @@ M.parse = function(target)
         { size = 2,
           name = "Machine" },
         { size = 2,
-          name = "NumberOfSections" },
+          name = "NumberOfSections"},
         { size = 4,
           name = "TimeDateStamp" },
         { size = 4,
@@ -116,15 +165,16 @@ M.parse = function(target)
     f:close()
     return nil, "Invalid PE header"
   end
+  out.PEheader = nil  -- remove it, has no value
   out.dump = M.dump  -- export dump function as a method
   
-  if out.SizeOfOptionalHeader > 0 then
+  if HEX_DEC(out.SizeOfOptionalHeader) > 0 then
     -- parse optional header; standard
     get_list({
         { size = 2,
           name = "Magic" },
         { size = 1,
-          name = "MajorLinkerVersion" },
+          name = "MajorLinkerVersion"},
         { size = 1,
           name = "MinorLinkerVersion"},
         { size = 4,
@@ -138,7 +188,7 @@ M.parse = function(target)
         { size = 4,
           name = "BaseOfCode"},
       }, f, out)
-    local plus = (out.Magic == 523)
+    local plus = (out.Magic == "20b")
     if not plus then -- plain PE32, not PE32+
       get_list({
           { size = 4,
@@ -193,7 +243,7 @@ M.parse = function(target)
           name = "NumberOfRvaAndSizes"},
       }, f, out)
     -- Read data directory entries
-    for i = 1, out.NumberOfRvaAndSizes do
+    for i = 1, HEX_DEC(out.NumberOfRvaAndSizes) do
       out.DataDirectory = out.DataDirectory or {}
       out.DataDirectory[i] = get_list({
           { size = 4,
@@ -259,7 +309,7 @@ M.parse = function(target)
           { size = 4,
             name = "ImportAddressTableRVA"},
         }, f)
-    if dll.NameRVA == 0 then
+    if HEX_DEC(dll.NameRVA) == 0 then
       -- this is the final NULL entry, so we're done
       done = true
     else
@@ -278,27 +328,25 @@ M.parse = function(target)
   return out
 end
 
-function DEC_HEX(IN, len)
-    local B,K,OUT,I,D=16,"0123456789ABCDEF","",0
-    while IN>0 do
-        I=I+1
-        IN,D=math.floor(IN/B),math.mod(IN,B)+1
-        OUT=string.sub(K,D,D)..OUT
-    end
-    len = len or string.len(OUT)
-    if len<1 then len = 1 end
-    return (string.rep("0",len) .. OUT):sub(-len,-1)
+-- pad a string (prefix) to a specific length
+local function pad(str, l, chr)
+  chr = chr or " "
+  l = l or 0
+  return string.rep(chr,l-#str)..str
 end
 
 --- Dumps the output parsed.
 -- This function is also available as a method on the parsed output table
 M.dump = function(obj)
-  for k,v in pairs(obj) do 
+  local l = 0
+  for k,v in pairs(obj) do if #k > l then l = #k end end
+  
+  for k,v in pairs(obj) do
     if type(v) == "number" then
-      print(DEC_HEX(v,8).."  ".. k)
+      print(k..string.rep(" ", l - #k + 1)..": "..v.." (dec)")
     else
-      if (k ~= "DataDirectory") and (k ~= "Sections") then
-        print(k,v)
+      if (type(v)=="string") and (k ~= "DataDirectory") and (k ~= "Sections") then
+        print(k..string.rep(" ", l - #k + 1)..": "..v)
       end
     end
   end
@@ -306,7 +354,7 @@ M.dump = function(obj)
   if obj.DataDirectory then
     print("DataDirectory (RVA, size):")
     for i, v in ipairs(obj.DataDirectory) do
-      print("   Entry "..DEC_HEX(i-1).." "..DEC_HEX(v.VirtualAddress,8).." "..DEC_HEX(v.Size,8).." "..v.name)
+      print("   Entry "..DEC_HEX(i-1).." "..pad(v.VirtualAddress,8,"0").." "..pad(v.Size,8,"0").." "..v.name)
     end
   end
   
@@ -314,7 +362,7 @@ M.dump = function(obj)
     print("Sections:")
     print("idx name     RVA      VSize    Offset   RawSize")
     for i, v in ipairs(obj.Sections) do
-      print("  "..i.." "..v.Name.. string.rep(" ",9-#v.Name)..DEC_HEX(v.VirtualAddress,8).." "..DEC_HEX(v.VirtualSize,8).." "..DEC_HEX(v.PointerToRawData,8).." "..DEC_HEX(v.SizeOfRawData,8))
+      print("  "..i.." "..v.Name.. string.rep(" ",9-#v.Name)..pad(v.VirtualAddress,8,"0").." "..pad(v.VirtualSize,8,"0").." "..pad(v.PointerToRawData,8,"0").." "..pad(v.SizeOfRawData,8,"0"))
     end
   end
   
@@ -325,6 +373,3 @@ M.dump = function(obj)
 end
 
 return M
-
-
-

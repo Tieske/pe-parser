@@ -6,7 +6,7 @@ Lua module to parse a Portable Executable (.exe , .dll, etc.) file and extract m
 Limitations
 ===========
 
-It uses regular Lua numbers, so 64bit numbers will not work properly because they are to big. Generally this is not an issue as files don't tend to be so big. One exception to that is for some bit-flag fields in 64bit format, which simply cannot be handled this way.
+It uses regular Lua numbers (for file seeking), so for really large files it will not work properly because Lua numbers cannot hold 64bit integers. Generally this is not an issue as executable files don't tend to be that big. All numbers returned will be as hex fromatted strings, so 64bit flag fields can be processed correctly.
 
 PE info
 =======
