@@ -64,6 +64,10 @@
 	<td class="summary">Calculates the fileoffset of a given RVA.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#msvcrt">msvcrt (infile)</a></td>
+	<td class="summary">Checks the msvcrt dll the binary was linked against.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#parse">parse (target)</a></td>
 	<td class="summary">Parses a file and extracts the information.</td>
 	</tr>
@@ -134,6 +138,34 @@
     <ol>
 
         fileoffset of the given RVA (number)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "msvcrt"></a>
+    <strong>msvcrt (infile)</strong>
+    </dt>
+    <dd>
+    Checks the msvcrt dll the binary was linked against.
+ Mixing and matching dlls only works when they all are using the same runtime, if
+ not unexpected errors will probably occur.
+ Checks the binary provided and then traverses all imported dlls to find the msvcrt
+ used (it will only look for the dlls in the same directory).
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">infile</span>
+         binary file to check
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        msvcrt name (uppercase, without extension) + file where the reference was found, or nil + error
     </ol>
 
 

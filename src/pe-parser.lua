@@ -251,7 +251,8 @@ M.parse = function(target)
     [34404] = "x86_64",    -- IMAGE_FILE_MACHINE_AMD64
   }
   
-  local f = assert(io.open(target, "rb"))
+  local f, err = io.open(target, "rb")
+  if not f then return nil, err end
   
   local MZ = f:read(2)
   if MZ ~= "MZ" then
@@ -501,6 +502,45 @@ M.dump = function(obj)
   for i, dll in ipairs(obj.DataDirectory.ImportTable) do
     print("   "..dll.Name)
   end
+end
+
+--- Checks the msvcrt dll the binary was linked against.
+-- Mixing and matching dlls only works when they all are using the same runtime, if
+-- not unexpected errors will probably occur.
+-- Checks the binary provided and then traverses all imported dlls to find the msvcrt
+-- used (it will only look for the dlls in the same directory).
+-- @param infile binary file to check
+-- @return msvcrt name (uppercase, without extension) + file where the reference was found, or nil + error
+function M.msvcrt(infile) 
+  local path, file = infile:match("(.+)\\(.+)$")
+  if not path then
+    path = ""
+    file = infile
+  else
+    path=path .. "\\"
+  end
+  local obj, err = M.parse(path..file)
+  if not obj then return obj, err end
+  
+  for i, dll in ipairs(obj.DataDirectory.ImportTable) do
+    dll = dll.Name:upper()
+	  local result = dll:match('(MSVCR%d*)%.DLL')
+	  if not result then
+	    result = dll:match('(MSVCRT)%.DLL')
+	  end
+    -- success, found it return name + binary where it was found
+    if result then return result, infile end
+  end
+  
+  -- not found, so traverse all imported dll's
+  for i, dll in ipairs(obj.DataDirectory.ImportTable) do
+    local rt, ref = M.msvcrt(path..dll.Name)
+    if rt then 
+      return rt, ref  -- found it
+    end
+  end
+
+  return nil, "No msvcrt found"
 end
 
 return M
