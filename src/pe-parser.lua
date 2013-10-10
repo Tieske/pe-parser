@@ -7,11 +7,14 @@
 
 local M = {}
 
---- Table with constants/flag-constants that represent.
--- Named elements can be looked up by their name in the `const` table.
+--- Table with named constants/flag-constants.
+-- Named elements can be looked up by their name in the `const` table. The sub tables are index by value.
 -- For flag fields the name is extended with `_flags`.
--- @usage local desc = pe.const.Magic(myobj.Magic)
--- local flag_list = pe.const.Characteristics_flags  -- return list of flags for Characteristics field
+-- @usage -- lookup descriptive name for the myobj.Magic value
+-- local desc = pe.const.Magic(myobj.Magic)
+-- 
+-- -- get list of flag names, indexed by flag values, for the Characteristics field
+-- local flag_list = pe.const.Characteristics_flags
 M.const = {
   Magic = {
     ["10b"] = "PE32",
@@ -129,7 +132,7 @@ M.const = {
 -- @param IN the number to convert to hex
 -- @param len the size to return, any result smaller will be prefixed by "0"s
 -- @return string containing hex representation
-local function DEC_HEX(IN, len)
+function M.toHex(IN, len)
     local B,K,OUT,I,D=16,"0123456789abcdef","",0
     while IN>0 do
         I=I+1
@@ -144,7 +147,7 @@ end
 --- convert HEX to integer
 -- @param IN the string to convert to dec
 -- @return number in dec format
-local function HEX_DEC(IN)
+function M.toDec(IN)
   assert(type(IN)=="string")
   local OUT = 0
   IN = IN:lower()
@@ -171,7 +174,7 @@ local function get_hex(str)
   assert(str)
   local r = ""
   for i = #str, 1, -1 do
-    r = r .. DEC_HEX(string.byte(str,i,i),2)
+    r = r .. M.toHex(string.byte(str,i,i),2)
   end
   while (#r > 1) and (r:sub(1,1) == "0") do
     r = r:sub(2, -1)
@@ -211,16 +214,16 @@ end
 M.get_fileoffset = function(obj, RVA)
   -- given an object with a section table, and an RVA, it returns
   -- the fileoffset for the data
-  if type(RVA)=="string" then RVA = HEX_DEC(RVA) end
+  if type(RVA)=="string" then RVA = M.toDec(RVA) end
   local section
   for i, s in ipairs(obj.Sections) do
-    if HEX_DEC(s.VirtualAddress) <= RVA and HEX_DEC(s.VirtualAddress) + HEX_DEC(s.VirtualSize) >= RVA then
+    if M.toDec(s.VirtualAddress) <= RVA and M.toDec(s.VirtualAddress) + M.toDec(s.VirtualSize) >= RVA then
       section = s
       break
     end
   end
   if not section then return nil, "No match RVA with Section list, RVA out of bounds" end
-  return RVA - HEX_DEC(section.VirtualAddress) + HEX_DEC(section.PointerToRawData)
+  return RVA - M.toDec(section.VirtualAddress) + M.toDec(section.PointerToRawData)
 end
 
 local function readstring(f)
@@ -235,7 +238,7 @@ local function readstring(f)
 end
 
 --- Parses a file and extracts the information.
--- All numbers are delivered as "string" types containing hex values, see `DEC_HEX` and `HEX_DEC` conversion functions.
+-- All numbers are delivered as "string" types containing hex values, see `toHex` and `toDec` conversion functions.
 -- @return table with data, or nil + error
 -- @usage local pe = require("pe-parser")
 -- local obj = pe.parse("c:\lua\lua.exe")
@@ -287,7 +290,7 @@ M.parse = function(target)
   out.PEheader = nil  -- remove it, has no value
   out.dump = M.dump  -- export dump function as a method
   
-  if HEX_DEC(out.SizeOfOptionalHeader) > 0 then
+  if M.toDec(out.SizeOfOptionalHeader) > 0 then
     -- parse optional header; standard
     get_list({
         { size = 2,
@@ -362,7 +365,7 @@ M.parse = function(target)
           name = "NumberOfRvaAndSizes"},
       }, f, out)
     -- Read data directory entries
-    for i = 1, HEX_DEC(out.NumberOfRvaAndSizes) do
+    for i = 1, M.toDec(out.NumberOfRvaAndSizes) do
       out.DataDirectory = out.DataDirectory or {}
       out.DataDirectory[i] = get_list({
           { size = 4,
@@ -382,7 +385,7 @@ M.parse = function(target)
   end
   
   -- parse section table
-  for i = 1, out.NumberOfSections do
+  for i = 1, M.toDec(out.NumberOfSections) do
     out.Sections = out.Sections or {}
     out.Sections[i] = get_list({
         { size = 8,
@@ -428,7 +431,7 @@ M.parse = function(target)
           { size = 4,
             name = "ImportAddressTableRVA"},
         }, f)
-    if HEX_DEC(dll.NameRVA) == 0 then
+    if M.toDec(dll.NameRVA) == 0 then
       -- this is the final NULL entry, so we're done
       done = true
     else
@@ -482,7 +485,7 @@ M.dump = function(obj)
   if obj.DataDirectory then
     print("DataDirectory (RVA, size):")
     for i, v in ipairs(obj.DataDirectory) do
-      print("   Entry "..DEC_HEX(i-1).." "..pad(v.VirtualAddress,8,"0").." "..pad(v.Size,8,"0").." "..v.name)
+      print("   Entry "..M.toHex(i-1).." "..pad(v.VirtualAddress,8,"0").." "..pad(v.Size,8,"0").." "..v.name)
     end
   end
   
