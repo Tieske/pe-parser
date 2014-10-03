@@ -25,7 +25,7 @@ build = {
    modules = {
       ["pe-parser"] = "src/pe-parser.lua"
    },
-   copy_directories = { "doc", "test" },
+   copy_directories = { "doc" },
    install = {
       bin = {
          ["pe-parser"]   = "bin/pe-parser.lua",
