@@ -4,6 +4,8 @@ pe-parser
 Lua module to parse a Portable Executable (.exe , .dll, etc.) file and extract metadata. The implementation is far from complete, but it works for the basics. It was developed to check 32/64bit-ness of a binary and imported dll's.
 Documentation is available in LDoc format, in the `doc` directory.
 
+A commandline script is available, also by the name of `pe-parser`. Use `pe-parser -help` for information on the usage of this utility.
+
 Limitations
 ===========
 
