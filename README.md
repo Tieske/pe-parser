@@ -23,7 +23,7 @@ http://www.sunshine2k.de/reversing/tuts/tut_rvait.htm
 Copyright
 =========
 
-Copyright 2013 Thijs Schreijer
+Copyright 2013-2014 Thijs Schreijer
 
 License
 =======

@@ -1,5 +1,5 @@
 package = "pe-parser"
-version = "0.1.0-1"
+version = "0.2.0-1"
 
 description = {
    summary = "Portable Executable parser",
@@ -16,13 +16,19 @@ dependencies = {
 }
 
 source = {
-   url = "https://github.com/Tieske/pe-parser/archive/version_0.1.tar.gz",
-   dir = "pe-parser-version_0.1",
+   url = "https://github.com/Tieske/pe-parser/archive/version_0.2.tar.gz",
+   dir = "pe-parser-version_0.2",
 }
 
 build = {
    type = "builtin",
    modules = {
       ["pe-parser"] = "src/pe-parser.lua"
-   }
+   },
+   copy_directories = { "doc", "test" },
+   install = {
+      bin = {
+         ["pe-parser"]   = "bin/pe-parser.lua",
+      },
+   },
 }
