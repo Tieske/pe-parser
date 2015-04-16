@@ -528,9 +528,9 @@ function M.msvcrt(infile)
   
   for i, dll in ipairs(obj.DataDirectory.ImportTable) do
     dll = dll.Name:upper()
-	  local result = dll:match('(MSVCR%d*)%.DLL')
+	  local result = dll:match('(MSVCR%d*D?)%.DLL')
 	  if not result then
-	    result = dll:match('(MSVCRT)%.DLL')
+	    result = dll:match('(MSVCRTD?)%.DLL')
 	  end
     -- success, found it return name + binary where it was found
     if result then return result, infile end

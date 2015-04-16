@@ -9,7 +9,7 @@ A commandline script is available, also by the name of `pe-parser`. Use `pe-pars
 Limitations
 ===========
 
-It uses regular Lua numbers (for file seeking), so for really large files it will not work properly because Lua numbers cannot hold 64bit integers. Generally this is not an issue as executable files don't tend to be that big. All numbers returned will be as hex fromatted strings, so 64bit flag fields can be processed correctly.
+It uses regular Lua numbers (for file seeking), so for really large files it will not work properly because Lua numbers cannot hold 64bit integers. Generally this is not an issue as executable files don't tend to be that big. All numbers returned will be as hex formatted strings, so 64bit flag fields can be processed correctly.
 
 PE info
 =======
