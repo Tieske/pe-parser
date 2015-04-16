@@ -1,5 +1,5 @@
 package = "pe-parser"
-version = "0.2.0-1"
+version = "0.3.0-1"
 
 description = {
    summary = "Portable Executable parser",
@@ -16,8 +16,8 @@ dependencies = {
 }
 
 source = {
-   url = "https://github.com/Tieske/pe-parser/archive/version_0.2.tar.gz",
-   dir = "pe-parser-version_0.2",
+   url = "https://github.com/Tieske/pe-parser/archive/version_0.3.tar.gz",
+   dir = "pe-parser-version_0.3",
 }
 
 build = {
