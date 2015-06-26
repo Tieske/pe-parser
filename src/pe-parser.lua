@@ -532,6 +532,9 @@ function M.msvcrt(infile)
 	  if not result then
 	    result = dll:match('(MSVCRTD?)%.DLL')
 	  end
+	  if not result then
+	    result = dll:match('(VCRUNTIME%d*D?)%.DLL')
+	  end
     -- success, found it return name + binary where it was found
     if result then return result, infile end
   end
