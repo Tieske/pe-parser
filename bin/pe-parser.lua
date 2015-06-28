@@ -20,7 +20,7 @@ if ((arg[opt or ""] or ""):find("dump")) then
 end
 
 if argstart>argend or ((arg[opt or ""] or ""):find("help")) then
-  print[[PE-parser commandline utility for checking PE (Portable Executable) files (version 0.2)
+  print[[PE-parser commandline utility for checking PE (Portable Executable) files (version 0.4)
 
 USAGE: pe-parser [-dump|-runtime|-help] file1 [file2 [...] ]
 
