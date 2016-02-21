@@ -23,7 +23,7 @@ PE info
 Copyright
 =========
 
-Copyright 2013-2015 Thijs Schreijer
+Copyright 2013-2016 Thijs Schreijer
 
 License
 =======

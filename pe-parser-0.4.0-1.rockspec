@@ -1,5 +1,5 @@
 package = "pe-parser"
-version = "0.4.0-1"
+version = "0.5.0-1"
 
 description = {
    summary = "Portable Executable parser",
@@ -12,12 +12,12 @@ description = {
 }
 
 dependencies = {
-   "lua >= 5.1, <= 5.2"
+   "lua >= 5.1, <= 5.4"
 }
 
 source = {
-   url = "https://github.com/Tieske/pe-parser/archive/version_0.4.tar.gz",
-   dir = "pe-parser-version_0.4",
+   url = "https://github.com/Tieske/pe-parser/archive/version_0.5.tar.gz",
+   dir = "pe-parser-version_0.5",
 }
 
 build = {
