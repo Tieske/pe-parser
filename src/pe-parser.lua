@@ -5,7 +5,7 @@
 -- case of 64 bit fields (bit/flag fields). Pointer arithmetic is still done numerically, so for
 -- very large files this could lead to undefined results. Use with care!
 --
--- Version 0.4, [copyright (c) 2013-2015 Thijs Schreijer](http://www.thijsschreijer.nl)
+-- Version 0.5, [copyright (c) 2013-2018 Thijs Schreijer](http://www.thijsschreijer.nl)
 -- @name pe-parser
 -- @class module
 

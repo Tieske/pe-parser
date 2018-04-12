@@ -1,5 +1,5 @@
 package = "pe-parser"
-version = "0.5.0-1"
+version = "0.5.0-2"
 
 description = {
    summary = "Portable Executable parser",
@@ -25,7 +25,7 @@ build = {
    modules = {
       ["pe-parser"] = "src/pe-parser.lua"
    },
-   copy_directories = { "doc" },
+   copy_directories = { "docs" },
    install = {
       bin = {
          ["pe-parser"]   = "bin/pe-parser.lua",
