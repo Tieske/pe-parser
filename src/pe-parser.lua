@@ -535,6 +535,16 @@ function M.msvcrt(infile)
 	  if not result then
 	    result = dll:match('(VCRUNTIME%d*D?)%.DLL')
 	  end
+    if not result then
+      result = dll:match('(UCRTBASED?)%.DLL')
+    end
+    if not result then
+      -- api-ms-win-crt-xxx also indicate the universal runtime
+      result = dll:match('(API%-MS%-WIN%-CRT%-RUNTIME%-)')
+      if result then
+        result = "UCRTBASE"
+      end
+    end
     -- success, found it return name + binary where it was found
     if result then return result, infile end
   end
