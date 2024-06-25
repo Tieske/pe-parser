@@ -528,13 +528,13 @@ function M.msvcrt(infile)
 
   for i, dll in ipairs(obj.DataDirectory.ImportTable) do
     dll = dll.Name:upper()
-	  local result = dll:match('(MSVCR%d*D?)%.DLL')
-	  if not result then
-	    result = dll:match('(MSVCRTD?)%.DLL')
-	  end
-	  if not result then
-	    result = dll:match('(VCRUNTIME%d*D?)%.DLL')
-	  end
+    local result = dll:match('(MSVCR%d*D?)%.DLL')
+    if not result then
+      result = dll:match('(MSVCRTD?)%.DLL')
+    end
+    if not result then
+      result = dll:match('(VCRUNTIME%d*D?)%.DLL')
+    end
     if not result then
       result = dll:match('(UCRTBASED?)%.DLL')
     end
