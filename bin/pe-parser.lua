@@ -7,7 +7,7 @@ for k,v in ipairs(runtime) do
 end
 
 local opt, argstart, argend
-if (runtime[arg[1] or ""]) then 
+if (runtime[arg[1] or ""]) then
   opt = 1
   argstart = 2
   argend = #arg
@@ -15,12 +15,12 @@ else
   argstart = 1
   argend = #arg
 end
-if ((arg[opt or ""] or ""):find("dump")) then 
+if ((arg[opt or ""] or ""):find("dump")) then
   opt = nil  -- this is the default
 end
 
 if argstart>argend or ((arg[opt or ""] or ""):find("help")) then
-  print[[PE-parser commandline utility for checking PE (Portable Executable) files (version 0.4)
+  print[[PE-parser commandline utility for checking PE (Portable Executable) files (version ]]..pe._VERSION..[[)
 
 USAGE: pe-parser [-dump|-runtime|-help] file1 [file2 [...] ]
 
@@ -31,7 +31,7 @@ OPTIONS
  -dump    : Parses the file and dumps the output (default)
  -runtime : Only checks the MSVCRT version the binary uses. This
             will traverse the dependency tree of the file.
- -help    : displays this help text   
+ -help    : displays this help text
 options can be prefixed with one (as above), two or no dashes
 ]]
   if argstart>=argend then os.exit(1) end -- no arguments, error

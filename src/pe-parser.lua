@@ -5,11 +5,13 @@
 -- case of 64 bit fields (bit/flag fields). Pointer arithmetic is still done numerically, so for
 -- very large files this could lead to undefined results. Use with care!
 --
--- Version 0.5, [copyright (c) 2013-2018 Thijs Schreijer](http://www.thijsschreijer.nl)
+-- Version 0.6, [copyright (c) 2013-2024 Thijs Schreijer](http://www.thijsschreijer.nl)
 -- @name pe-parser
 -- @class module
 
-local M = {}
+local M = {
+  _VERSION = "0.6",
+}
 
 --- Table with named constants/flag-constants.
 -- Named elements can be looked up by their name in the `const` table. The sub tables are index by value.
