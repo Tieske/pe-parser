@@ -23,9 +23,31 @@ PE info
 Copyright
 =========
 
-Copyright 2013-2018 Thijs Schreijer
+Copyright 2013-2024 Thijs Schreijer
 
 License
 =======
 
-MIT X11 
+MIT X11
+
+History
+=======
+
+#### Releasing new versions
+
+- update copyright years + version in; `README.md`, `src/pe-parser.lua` (doc header and module constant)
+- update rockspec file: rename and update version in contents
+- generate documentation using `ldoc`
+- commit the release as: "release X.Y"
+- tag the release commit as "version_X.Y"
+- push the release commit
+- push the release tag
+- upload the rock to luarocks
+
+### unreleased
+
+- fixed version numbers in code
+
+### version 0.6, 25-Jun-2024
+
+- Add detection of the universal runtime
